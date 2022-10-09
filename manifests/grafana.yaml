@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app: grafana
+  labels:
+    app: grafana
+  name: grafana
+  namespace: charon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        app: grafana
+      labels:
+        app: grafana
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+        - image: grafana/grafana:9.0.7
+          name: grafana
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: grafana-config
+              mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+              subPath: datasource.yaml
+          volumeMounts:
+            - name: grafana-config
+              mountPath: /etc/grafana/provisioning/dashboards/datasource.yaml
+              subPath: datasource.yaml
+          volumeMounts:
+            - name: grafana-config
+              mountPath: /etc/grafana/grafana.ini
+              subPath: grafana.ini
+          volumeMounts:
+            - name: grafana-config
+              mountPath: /etc/dashboards/simnet_dash.json
+              subPath: simnet_dash.json
+      volumes:
+        - name: grafana-config
+          configMap:
+            name: grafana-config
+            defaultMode: 420
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: charon
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000

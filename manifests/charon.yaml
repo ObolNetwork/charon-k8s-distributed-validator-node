@@ -1,0 +1,108 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: charon
+  name: charon
+  namespace: charon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: charon
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: charon
+    spec:
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
+      containers:
+        - name: charon
+          image: ghcr.io/obolnetwork/charon:v0.10.1
+          imagePullPolicy: Always
+          command: ["/usr/local/bin/charon"]
+          args: ["run"]
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 3620
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 3620
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: charon-config
+          volumeMounts:
+            - name: validator-keys
+              mountPath: /charon/validator_keys
+            - name: charon-enr-private-key
+              mountPath: /charon
+            - name: cluster-lock
+              mountPath: /charon
+      volumes:
+        - name: validator-keys
+          projected:
+            sources:
+            - secret:
+                name: validator-keys
+        - name: charon-enr-private-key
+          projected:
+            sources:
+            - secret:
+                name: charon-enr-private-key
+        - name: cluster-lock
+          projected:
+            sources:
+            - secret:
+                name: cluster-lock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: charon
+  namespace: charon
+  labels:
+    app: charon
+spec:
+  selector:
+    app: charon
+  ports:
+  ports:
+    - name: validator-api
+      protocol: TCP
+      port: 3600
+      targetPort: 3600
+    - name: p2p-tcp
+      protocol: TCP
+      port: 3610
+      targetPort: 3610
+    - name: monitoring
+      protocol: TCP
+      port: 3620
+      targetPort: 3620
+    - name: p2p-udp
+      protocol: UDP
+      port: 3630
+      targetPort: 3630
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: charon
+  namespace: charon
+spec:
+  selector:
+    matchLabels:
+      app: charon
+  endpoints:
+  - port: monitoring
