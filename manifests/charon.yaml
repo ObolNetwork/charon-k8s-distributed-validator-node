@@ -77,7 +77,6 @@ spec:
   selector:
     app: charon
   ports:
-  ports:
     - name: validator-api
       protocol: TCP
       port: 3600
