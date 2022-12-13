@@ -88,33 +88,44 @@ At this point you should make a backup of the `.charon/validator_keys` folder as
 
 If taking part in the official Athena testnet, one cluster member will have to submit the `cluster-lock` and `deposit-data` files to the Obol Team, setting the stage for activation.
 
-## Step 4. Start the Distributed Validator Cluster
+## Step 4. Start the Distributed Validator Node
 
-With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term. This repo is configured to sync an execution layer client (`geth`) and a consensus layer client (`lighthouse`).
+With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term.
 
-**NOTE**: Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with your beacon node URL.
+**NOTE:**
+- Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with list of beacon nodes endpoints.
+- Update the `$NAMESPACE` in all yaml files `manifests/*.yaml`
 
+### Create namespace
+Choose a unique namespace name to avoid conflicts with the existing namespaces.
 ```
-# Create charon namespace
-kubectl create namespace charon
-
-# Populate .charon folder artefacts as kubernetes secrets
+kubectl create namespace <namespace_name>
+```
+### Create k8s secrets
+Populate the cluster config and validators keys as k8s secrets.
+```
 files=""
 for secret in ./.charon/validator_keys/*; do
     files="$files --from-file=./.charon/validator_keys/$(basename $secret)"
 done
-kubectl -n charon create secret generic validator-keys $files
-kubectl -n charon create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
-kubectl -n charon create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
 
-# Spin up a Distributed Validator Node with a Validator Client
-kubectl create -f ./manifests
+kubectl -n <namespace_name> create secret generic validator-keys $files
 
-# Open Grafana dashboard
-kubectl -n charon port-forward svc/grafana 3000:3000
-open http://localhost:3000/d/singlenode/
+kubectl -n <namespace_name> create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
+
+kubectl -n <namespace_name> create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
 ```
 
+### Start Charon Node
+```
+kubectl -n <namespace_name> create -f ./manifests
+```
+
+### Access Grafana
+```
+kubectl -n <namespace_name> port-forward svc/grafana 3000:3000
+open http://localhost:3000/d/singlenode/
+```
 You should use the grafana dashboard to infer whether your cluster is healthy. In particular you should check:
 
 - That your charon client can connect to the configured beacon client.
@@ -123,10 +134,8 @@ You should use the grafana dashboard to infer whether your cluster is healthy. I
 You might notice that there are logs indicating that a validator cannot be found and that APIs are returning 404. This is to be expected at this point, as the validator public keys listed in the lock file have not been deposited and acknowledged on the consensus layer yet (usually ~16 hours after the deposit is made).
 
 To turn off your node after checking the health of the cluster you can run:
-
 ```
-# Shut down the currently running distributed validator node
-docker-compose down
+kubectl delete ns <namespace_name>
 ```
 
 ## Step 5. Activate the deposit data
