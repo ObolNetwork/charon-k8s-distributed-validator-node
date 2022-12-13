@@ -5,7 +5,7 @@ metadata:
   labels:
     app: charon
   name: charon
-  namespace: charon
+  namespace: $NAMESPACE
 spec:
   replicas: 1
   selector:
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: charon
-  namespace: charon
+  namespace: $NAMESPACE
   labels:
     app: charon
 spec:
@@ -98,7 +98,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: charon
-  namespace: charon
+  namespace: $NAMESPACE
 spec:
   selector:
     matchLabels:
