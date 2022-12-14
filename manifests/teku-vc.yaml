@@ -61,9 +61,9 @@ spec:
               --validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000";
           volumeMounts:
             - name: validator-keys
-              mountPath: /charon/validator_keys
+              mountPath: /charon/charon/validator_keys
             - name: charon-enr-private-key
-              mountPath: /charon
+              mountPath: /charon/charon
             - name: cluster-lock
               mountPath: /charon
             - name: data

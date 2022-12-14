@@ -44,9 +44,9 @@ spec:
                 name: charon-config
           volumeMounts:
             - name: validator-keys
-              mountPath: /charon/validator_keys
+              mountPath: /charon/charon/validator_keys
             - name: charon-enr-private-key
-              mountPath: /charon
+              mountPath: /charon/charon
             - name: cluster-lock
               mountPath: /charon
       volumes:
