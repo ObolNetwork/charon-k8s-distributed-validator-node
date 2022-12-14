@@ -99,33 +99,33 @@ With the DKG ceremony over, the last phase before activation is to prepare your 
 ### Create namespace
 Choose a unique namespace name to avoid conflicts with the existing namespaces.
 ```
-kubectl create namespace <namespace_name>
+NAMESPACE=<cluster_name>
+kubectl create namespace $NAMESPACE
 ```
 ### Create k8s secrets
 Populate the cluster config and validators keys as k8s secrets.
 ```
+% cat deploy-node.sh 
 files=""
 for secret in ./.charon/validator_keys/*; do
     files="$files --from-file=./.charon/validator_keys/$(basename $secret)"
 done
-
-kubectl -n <namespace_name> create secret generic validator-keys $files
-
-kubectl -n <namespace_name> create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
-
-kubectl -n <namespace_name> create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
+kubectl -n $NAMESPACE create secret generic validator-keys $files
+kubectl -n $NAMESPACE create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
+kubectl -n $NAMESPACE create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
 ```
 
 ### Start Charon Node
 ```
-kubectl -n <namespace_name> create -f ./manifests
+kubectl -n $NAMESPACE create -f ./manifests
 ```
 
 ### Access Grafana
 ```
-kubectl -n <namespace_name> port-forward svc/grafana 3000:3000
-open http://localhost:3000/d/singlenode/
+kubectl -n $NAMESPACE port-forward svc/grafana 3000:3000
+open http://localhost:3000
 ```
+
 You should use the grafana dashboard to infer whether your cluster is healthy. In particular you should check:
 
 - That your charon client can connect to the configured beacon client.
@@ -135,7 +135,7 @@ You might notice that there are logs indicating that a validator cannot be found
 
 To turn off your node after checking the health of the cluster you can run:
 ```
-kubectl delete ns <namespace_name>
+kubectl delete ns $NAMESPACE
 ```
 
 ## Step 5. Activate the deposit data
