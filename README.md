@@ -94,7 +94,7 @@ With the DKG ceremony over, the last phase before activation is to prepare your 
 
 **NOTE:**
 - Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with list of beacon nodes endpoints.
-- Update the `$NAMESPACE` in all yaml files `manifests/*.yaml`
+- Update `$NAMESPACE` in all yaml files in the `manifests` directory (`manifests/*.yaml`).
 
 ### Create namespace
 Choose a unique namespace name to avoid conflicts with the existing namespaces.
