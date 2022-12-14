@@ -94,30 +94,11 @@ With the DKG ceremony over, the last phase before activation is to prepare your 
 
 **NOTE:**
 - Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with list of beacon nodes endpoints.
-- Update `$NAMESPACE` in all yaml files in the `manifests` directory (`manifests/*.yaml`).
+- Update `$NAMESPACE` in all yaml files in the `manifests` directory (`manifests/*.yaml`). Please ensure you replace `$NAMESPACE` with the name of your cluster.
 
-### Create namespace
-Choose a unique namespace name to avoid conflicts with the existing namespaces.
+### Deploy Charon Node
 ```
-NAMESPACE=<cluster_name>
-kubectl create namespace $NAMESPACE
-```
-### Create k8s secrets
-Populate the cluster config and validators keys as k8s secrets.
-```
-% cat deploy-node.sh 
-files=""
-for secret in ./.charon/validator_keys/*; do
-    files="$files --from-file=./.charon/validator_keys/$(basename $secret)"
-done
-kubectl -n $NAMESPACE create secret generic validator-keys $files
-kubectl -n $NAMESPACE create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
-kubectl -n $NAMESPACE create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
-```
-
-### Start Charon Node
-```
-kubectl -n $NAMESPACE create -f ./manifests
+./deploy-node.sh <cluster_name> # Please ensure you replace `<cluster_name>` with the name of your cluster.
 ```
 
 ### Access Grafana
