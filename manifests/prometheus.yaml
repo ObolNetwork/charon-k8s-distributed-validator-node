@@ -1,10 +1,33 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: $CLUSTER_NAME
+data:
+  prometheus.yaml: |
+    global:
+      scrape_interval:     30s # Set the scrape interval to every 30 seconds.
+      evaluation_interval: 30s # Evaluate rules every 30 seconds.
+    remote_write:
+      - url: https://vm.monitoring.gcp.obol.tech/write
+        authorization:
+          credentials: $MONITORING_TOKEN
+    scrape_configs:
+      - job_name: 'charon'
+        static_configs:
+          - targets: ['charon:3620']
+      - job_name: 'teku'
+        static_configs:
+          - targets: ['teku:8008']   
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: prometheus
   name: prometheus
-  namespace: $NAMESPACE
+  namespace: $CLUSTER_NAME
 spec:
   replicas: 1
   selector:
@@ -23,24 +46,24 @@ spec:
         - name: prometheus
           image: prom/prometheus:v2.38.0
           args:
-            - "--config.file=/etc/prometheus/prometheus.yaml"
+            - "-.file=/etc/prometheus/prometheus.yaml"
           ports:
             - containerPort: 9090
           volumeMounts:
-            - name: prometheus-config
+            - name: prometheus
               mountPath: /etc/prometheus/prometheus.yaml
               subPath: prometheus.yaml
       volumes:
-        - name: prometheus-config
+        - name: prometheus
           configMap:
-            name: prometheus-config
+            name: prometheus
             defaultMode: 420
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: prometheus
-  namespace: $NAMESPACE
+  namespace: $CLUSTER_NAME
 spec:
   selector:
     app: prometheus
