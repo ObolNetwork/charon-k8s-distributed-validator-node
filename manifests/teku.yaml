@@ -5,7 +5,7 @@ metadata:
   labels:
     app: teku
   name: teku
-  namespace: $NAMESPACE
+  namespace: $CLUSTER_NAME
 spec:
   replicas: 1
   selector:
@@ -41,8 +41,8 @@ spec:
               mountPath: "/validator_keys"
       containers:
         - name: teku
-          image: consensys/teku:22.9.1
           imagePullPolicy: Always
+          image: consensys/teku:$TEKU_VERSION
           command:
             - sh
             - -ace
@@ -60,30 +60,14 @@ spec:
               --beacon-node-api-endpoint="http://charon:3600" \
               --validators-proposer-default-fee-recipient="0x0000000000000000000000000000000000000000";
           volumeMounts:
-            - name: validator-keys
-              mountPath: /charon/charon/validator_keys
-            - name: charon-enr-private-key
-              mountPath: /charon/charon
-            - name: cluster-lock
-              mountPath: /charon
             - name: data
               mountPath: /data/teku
       volumes:
-        - name: validator-keys
+        - name: validators
           projected:
             sources:
             - secret:
-                name: validator-keys
-        - name: charon-enr-private-key
-          projected:
-            sources:
-            - secret:
-                name: charon-enr-private-key
-        - name: cluster-lock
-          projected:
-            sources:
-            - secret:
-                name: cluster-lock
+                name: validators
         - name: data
           emptyDir: {}
 ---
@@ -91,7 +75,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: teku
-  namespace: $NAMESPACE
+  namespace: $CLUSTER_NAME
   labels:
     app: teku
 spec:
@@ -107,7 +91,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: teku
-  namespace: $NAMESPACE
+  namespace: $CLUSTER_NAME
 spec:
   selector:
     matchLabels:
