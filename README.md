@@ -92,9 +92,11 @@ If taking part in the official Athena testnet, one cluster member will have to s
 
 With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term.
 
-**NOTE:**
-- Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with list of beacon nodes endpoints.
-- Update `$NAMESPACE` in all yaml files in the `manifests` directory (`manifests/*.yaml`). Please ensure you replace `$NAMESPACE` with the name of your cluster.
+### Prepare charon node environment variables file
+```
+cp .env.sample .env
+```
+Populate the .env file with the cluster name, charon versions, teku version, beacon nodes comma separated list, and monitoring token.
 
 ### Deploy Charon Node
 ```
