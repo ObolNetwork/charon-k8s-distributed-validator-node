@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: charon
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
 data:
   CHARON_VALIDATOR_API_ADDRESS: "0.0.0.0:3600"
   CHARON_P2P_TCP_ADDRESS: "0.0.0.0:3610"
@@ -24,7 +24,7 @@ metadata:
   labels:
     app: charon
   name: charon
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
 spec:
   replicas: 1
   selector:
@@ -89,7 +89,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: charon
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
   labels:
     app: charon
 spec:
@@ -117,7 +117,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: charon
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
 spec:
   selector:
     matchLabels:

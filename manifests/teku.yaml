@@ -5,7 +5,7 @@ metadata:
   labels:
     app: teku
   name: teku
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
 spec:
   replicas: 1
   selector:
@@ -37,7 +37,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/teku
-            - name: validators
+            - name: validator-keys
               mountPath: "/validator_keys"
       containers:
         - name: teku
@@ -63,11 +63,11 @@ spec:
             - name: data
               mountPath: /data/teku
       volumes:
-        - name: validators
+        - name: validator-keys
           projected:
             sources:
             - secret:
-                name: validators
+                name: validator-keys
         - name: data
           emptyDir: {}
 ---
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: teku
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
   labels:
     app: teku
 spec:
@@ -91,7 +91,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: teku
-  namespace: $CLUSTER_NAME
+  namespace: $NAME_SPACE
 spec:
   selector:
     matchLabels:
