@@ -1,11 +1,30 @@
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: charon
+  namespace: $NAME_SPACE
+data:
+  CHARON_VALIDATOR_API_ADDRESS: "0.0.0.0:3600"
+  CHARON_P2P_TCP_ADDRESS: "0.0.0.0:3610"
+  CHARON_MONITORING_ADDRESS: "0.0.0.0:3620"
+  CHARON_P2P_UDP_ADDRESS: "0.0.0.0:3630"
+  CHARON_P2P_BOOTNODE_RELAY: "true"
+  CHARON_P2P_BOOTNODES: "http://bootnode.lb.gcp.obol.tech:3640/enr"
+  CHARON_BEACON_NODE_ENDPOINTS: $BEACON_NODE_ENDPOINTS
+  CHARON_DATA_DIR: "/charon/charon"
+  CHARON_LOCK_FILE: "/charon/cluster-lock.json"
+  CHARON_P2P_EXTERNAL_HOSTNAME: ""
+  CHARON_LOG_LEVEL: "debug"
+  CHARON_P2P_DISABLE_REUSEPORT: "true"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: charon
   name: charon
-  namespace: charon
+  namespace: $NAME_SPACE
 spec:
   replicas: 1
   selector:
@@ -23,7 +42,7 @@ spec:
         fsGroup: 0
       containers:
         - name: charon
-          image: ghcr.io/obolnetwork/charon:v0.12.0
+          image: ghcr.io/obolnetwork/charon:$CHARON_VERSION
           imagePullPolicy: Always
           command: ["/usr/local/bin/charon"]
           args: ["run"]
@@ -41,12 +60,12 @@ spec:
             periodSeconds: 5
           envFrom:
             - configMapRef:
-                name: charon-config
+                name: charon
           volumeMounts:
             - name: validator-keys
-              mountPath: /charon/validator_keys
+              mountPath: /charon/charon/validator_keys
             - name: charon-enr-private-key
-              mountPath: /charon
+              mountPath: /charon/charon
             - name: cluster-lock
               mountPath: /charon
       volumes:
@@ -70,7 +89,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: charon
-  namespace: charon
+  namespace: $NAME_SPACE
   labels:
     app: charon
 spec:
@@ -98,7 +117,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: charon
-  namespace: charon
+  namespace: $NAME_SPACE
 spec:
   selector:
     matchLabels:

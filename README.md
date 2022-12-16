@@ -88,45 +88,24 @@ At this point you should make a backup of the `.charon/validator_keys` folder as
 
 If taking part in the official Athena testnet, one cluster member will have to submit the `cluster-lock` and `deposit-data` files to the Obol Team, setting the stage for activation.
 
-## Step 4. Start the Distributed Validator Cluster
+## Step 4. Start the Distributed Validator Node
 
-With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term. This repo is configured to sync an execution layer client (`geth`) and a consensus layer client (`lighthouse`).
+With the DKG ceremony over, the last phase before activation is to prepare your node for validating over the long term.
 
-**NOTE**: Update the `$BEACON_NODE_ENDPOINTS` in the `charon-config.yaml` with your beacon node URL.
-
+### Prepare charon node environment variables file
 ```
-# Create charon namespace
-kubectl create namespace charon
-
-# Populate .charon folder artefacts as kubernetes secrets
-files=""
-for secret in ./.charon/validator_keys/*; do
-    files="$files --from-file=./.charon/validator_keys/$(basename $secret)"
-done
-kubectl -n charon create secret generic validator-keys $files
-kubectl -n charon create secret generic charon-enr-private-key --from-file=charon-enr-private-key=./.charon/charon-enr-private-key
-kubectl -n charon create secret generic cluster-lock --from-file=cluster-lock.json=./.charon/cluster-lock.json
-
-# Spin up a Distributed Validator Node with a Validator Client
-kubectl create -f ./manifests
-
-# Open Grafana dashboard
-kubectl -n charon port-forward svc/grafana 3000:3000
-open http://localhost:3000/d/singlenode/
+cp .env.sample .env
 ```
+Populate the .env file with the cluster name, charon versions, teku version, beacon nodes comma separated list, and monitoring token.
 
-You should use the grafana dashboard to infer whether your cluster is healthy. In particular you should check:
-
-- That your charon client can connect to the configured beacon client.
-- That your charon client can connect to all peers
-
-You might notice that there are logs indicating that a validator cannot be found and that APIs are returning 404. This is to be expected at this point, as the validator public keys listed in the lock file have not been deposited and acknowledged on the consensus layer yet (usually ~16 hours after the deposit is made).
+### Deploy Charon Node
+```
+./deploy-node.sh <cluster_name> # Please ensure you replace `<cluster_name>` with the name of your cluster.
+```
 
 To turn off your node after checking the health of the cluster you can run:
-
 ```
-# Shut down the currently running distributed validator node
-docker-compose down
+kubectl delete ns $NAMESPACE
 ```
 
 ## Step 5. Activate the deposit data
