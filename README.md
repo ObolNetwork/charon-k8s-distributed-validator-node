@@ -103,19 +103,6 @@ Populate the .env file with the cluster name, charon versions, teku version, bea
 ./deploy-node.sh <cluster_name> # Please ensure you replace `<cluster_name>` with the name of your cluster.
 ```
 
-### Access Grafana
-```
-kubectl -n $NAMESPACE port-forward svc/grafana 3000:3000
-open http://localhost:3000
-```
-
-You should use the grafana dashboard to infer whether your cluster is healthy. In particular you should check:
-
-- That your charon client can connect to the configured beacon client.
-- That your charon client can connect to all peers
-
-You might notice that there are logs indicating that a validator cannot be found and that APIs are returning 404. This is to be expected at this point, as the validator public keys listed in the lock file have not been deposited and acknowledged on the consensus layer yet (usually ~16 hours after the deposit is made).
-
 To turn off your node after checking the health of the cluster you can run:
 ```
 kubectl delete ns $NAMESPACE
