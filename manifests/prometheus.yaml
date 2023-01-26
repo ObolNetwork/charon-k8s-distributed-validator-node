@@ -22,7 +22,7 @@ spec:
         runAsUser: 0
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.40.1
+          image: prom/prometheus:v2.41.0
           ports:
             - containerPort: 9090
           volumeMounts:
@@ -68,4 +68,3 @@ data:
       - job_name: 'teku'
         static_configs:
           - targets: ['teku:8008']   
-
