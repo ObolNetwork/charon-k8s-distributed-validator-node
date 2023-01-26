@@ -27,7 +27,7 @@ fi
 # set current namespace
 kubectl config set-context --current --namespace=${NAME_SPACE}
 
-# create validators keys secrets
+# create validators keys k8s secrets
 files=""
 for secret in ./.charon/validator_keys/*; do
     files="$files --from-file=./.charon/validator_keys/$(basename $secret)"
@@ -42,18 +42,20 @@ export TEKU_VERSION=$TEKU_VERSION
 export BEACON_NODE_ENDPOINTS=$BEACON_NODE_ENDPOINTS
 export MONITORING_TOKEN=$MONITORING_TOKEN
 
-# deploy charon node manifests
+# deploy charon node
 eval "cat <<EOF
 $(<./manifests/charon.yaml)
 EOF
 " | kubectl apply -f -
 
+# deploy teku vc
 eval "cat <<EOF
 $(<./manifests/teku.yaml)
 EOF
 " | kubectl apply -f -
 
+# deploy prometheus agent
 eval "cat <<EOF
-$(<./manifests/prom-agent.yaml)
+$(<./manifests/prometheus.yaml)
 EOF
 " | kubectl apply -f -
