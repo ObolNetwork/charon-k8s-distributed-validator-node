@@ -14,6 +14,8 @@ data:
   CHARON_LOCK_FILE: "/charon/cluster-lock.json"
   CHARON_P2P_EXTERNAL_HOSTNAME: ""
   CHARON_LOG_LEVEL: "debug"
+  CHARON_LOKI_ADDRESSES: $LOKI_ADDRESSES
+  CHARON_LOKI_SERVICE: "charon"
 ---
 apiVersion: apps/v1
 kind: Deployment
