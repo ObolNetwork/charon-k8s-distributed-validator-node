@@ -5,7 +5,7 @@ metadata:
   labels:
     app: teku
   name: teku
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   replicas: 1
   selector:
@@ -75,7 +75,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: teku
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
   labels:
     app: teku
 spec:
@@ -91,7 +91,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: teku
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   selector:
     matchLabels:
