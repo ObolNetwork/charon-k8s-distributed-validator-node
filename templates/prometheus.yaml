@@ -5,7 +5,7 @@ metadata:
   labels:
     app: prometheus
   name: prometheus
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   replicas: 1
   selector:
@@ -39,7 +39,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   selector:
     app: prometheus
@@ -51,7 +51,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 data:
   prometheus.yaml: |
     global:

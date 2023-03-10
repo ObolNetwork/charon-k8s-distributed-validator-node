@@ -3,14 +3,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: charon
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 data:
   CHARON_VALIDATOR_API_ADDRESS: "0.0.0.0:3600"
   CHARON_P2P_TCP_ADDRESS: "0.0.0.0:3610"
   CHARON_MONITORING_ADDRESS: "0.0.0.0:3620"
   CHARON_P2P_UDP_ADDRESS: "0.0.0.0:3630"
   CHARON_BEACON_NODE_ENDPOINTS: $BEACON_NODE_ENDPOINTS
-  CHARON_DATA_DIR: "/charon/charon"
+  CHARON_PRIVATE_KEY_FILE: "/charon/charon/private-key"
   CHARON_LOCK_FILE: "/charon/cluster-lock.json"
   CHARON_P2P_EXTERNAL_HOSTNAME: ""
   CHARON_LOG_LEVEL: "debug"
@@ -23,7 +23,7 @@ metadata:
   labels:
     app: charon
   name: charon
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   replicas: 1
   selector:
@@ -63,7 +63,7 @@ spec:
           volumeMounts:
             - name: validator-keys
               mountPath: /charon/charon/validator_keys
-            - name: charon-enr-private-key
+            - name: private-key
               mountPath: /charon/charon
             - name: cluster-lock
               mountPath: /charon
@@ -73,11 +73,11 @@ spec:
             sources:
             - secret:
                 name: validator-keys
-        - name: charon-enr-private-key
+        - name: private-key
           projected:
             sources:
             - secret:
-                name: charon-enr-private-key
+                name: private-key
         - name: cluster-lock
           projected:
             sources:
@@ -88,7 +88,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: charon
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
   labels:
     app: charon
 spec:
@@ -116,7 +116,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: charon
-  namespace: $NAME_SPACE
+  namespace: $NAMESPACE
 spec:
   selector:
     matchLabels:
