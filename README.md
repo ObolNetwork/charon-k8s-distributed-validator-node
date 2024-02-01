@@ -100,10 +100,10 @@ Populate the .env file with the cluster name, charon versions, teku version, bea
 
 ### Deploy Charon Node
 ```
-./deploy-node.sh <cluster_name> # Please ensure you replace `<cluster_name>` with the name of your cluster.
+./deploy-node.sh <node_name> # Please ensure you replace `<node_name>` with the name of your node.
 ```
 
-To turn off your node after checking the health of the cluster you can run:
+To turn off your node after checking the health of the node you can run:
 ```
 kubectl delete ns $NAMESPACE
 ```
