@@ -61,18 +61,11 @@ spec:
             - configMapRef:
                 name: charon
           volumeMounts:
-            - name: validator-keys
-              mountPath: /charon/charon/validator_keys
             - name: private-key
               mountPath: /charon/charon
             - name: cluster-lock
               mountPath: /charon
       volumes:
-        - name: validator-keys
-          projected:
-            sources:
-            - secret:
-                name: validator-keys
         - name: private-key
           projected:
             sources:
