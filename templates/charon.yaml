@@ -16,6 +16,7 @@ data:
   CHARON_LOG_LEVEL: "debug"
   CHARON_LOKI_ADDRESSES: $LOKI_ADDRESSES
   CHARON_LOKI_SERVICE: "charon"
+  CHARON_BUILDER_API: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
