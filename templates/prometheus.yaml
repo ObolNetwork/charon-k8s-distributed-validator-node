@@ -22,7 +22,12 @@ spec:
         runAsUser: 0
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.41.0
+          image: prom/prometheus:v2.46.0
+          args: 
+            - "--config.file=/etc/prometheus/prometheus.yaml"
+            - "--enable-feature=agent"
+            - "--enable-feature=expand-external-labels"
+            - "--log.level=info"
           ports:
             - containerPort: 9090
           volumeMounts:
